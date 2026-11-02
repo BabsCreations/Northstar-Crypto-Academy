@@ -1,5 +1,3 @@
-document.documentElement.classList.add('js-ready');
-
 const menuButton = document.querySelector('.menu-toggle');
 const navigation = document.querySelector('#primary-nav');
 
@@ -22,8 +20,20 @@ navigation?.querySelectorAll('a').forEach((link) => {
 });
 
 document.addEventListener('keydown', (event) => {
-  if (event.key === 'Escape') closeNavigation();
+  if (event.key === 'Escape' && menuButton?.getAttribute('aria-expanded') === 'true') {
+    closeNavigation();
+    menuButton.focus();
+  }
 });
+
+document.addEventListener('click', (event) => {
+  const header = document.querySelector('.site-header');
+  if (menuButton?.getAttribute('aria-expanded') === 'true' && header && !header.contains(event.target)) {
+    closeNavigation();
+  }
+});
+
+window.matchMedia('(min-width: 801px)').addEventListener('change', closeNavigation);
 
 const revealItems = document.querySelectorAll('[data-reveal]');
 if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -42,3 +52,6 @@ if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-mot
 
 const year = document.querySelector('#year');
 if (year) year.textContent = new Date().getFullYear();
+
+// Enable reveal styling only after the behavior is ready, so failures leave content visible.
+document.documentElement.classList.add('js-ready');
